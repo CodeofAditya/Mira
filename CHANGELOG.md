@@ -1,6 +1,9 @@
 ## Unreleased
 | Date | Commit | Change | File |
 |------|--------|--------|------|
+| 2026-03-10 | [bff02e8](https://github.com/WorkofAditya/Mira/commit/bff02e8066b7b7fea5a75e0bb81125606a910bb8) | Merge pull request #10 from WorkofAditya/codex/update-dispatch-page-to-Fullscreen |  |
+| 2026-03-10 | [6eddb24](https://github.com/WorkofAditya/Mira/commit/6eddb245b014a1bbe4003ddfbb0cdba0e84f547e) | Restyle dispatch page to match booking layout | [Dispatch.html](https://github.com/WorkofAditya/Mira/blob/main/Dispatch.html) |
+| 2026-03-10 | [6eddb24](https://github.com/WorkofAditya/Mira/commit/6eddb245b014a1bbe4003ddfbb0cdba0e84f547e) | Restyle dispatch page to match booking layout | [dispatch.css](https://github.com/WorkofAditya/Mira/blob/main/dispatch.css) |
 | 2026-02-25 | [8e2e87b](https://github.com/WorkofAditya/Mira/commit/8e2e87b796856d853247fcde13304b426663d2a0) | Change overflow to overflow-y for app and booking-body | [booking.css](https://github.com/WorkofAditya/Mira/blob/main/booking.css) |
 | 2026-02-25 | [7b5e2d9](https://github.com/WorkofAditya/Mira/commit/7b5e2d9ba664edc6178dffc6723709a6cad693a3) | Added Extra icons | [Dispatch.html](https://github.com/WorkofAditya/Mira/blob/main/Dispatch.html) |
 | 2026-02-25 | [7b5e2d9](https://github.com/WorkofAditya/Mira/commit/7b5e2d9ba664edc6178dffc6723709a6cad693a3) | Added Extra icons | [booking.html](https://github.com/WorkofAditya/Mira/blob/main/booking.html) |
