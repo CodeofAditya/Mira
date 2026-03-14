@@ -1,6 +1,9 @@
 // ================= DATABASE SETUP =================
 let isNewBooking = false;
 
+const APP_VERSION = 1;
+const VERSION_URL = "https://raw.githubusercontent.com/CodeofAditya/Mira/refs/heads/main/version.txt";
+
 const DB_NAME = "TransportDB";
 const STORE_NAME = "bookings";
 const DISPATCH_DB_NAME = "DispatchDB";
@@ -24,6 +27,8 @@ request.onupgradeneeded = e => {
 
 request.onsuccess = e => {
   db = e.target.result;
+
+  checkForAppUpdate();
 
   if (document.getElementById("branchSelect")) initHomePage();
   if (document.getElementById("branchFrom")) initBookingPage();
@@ -50,10 +55,7 @@ function initHomePage() {
 
   selectBtn.onclick = () => {
     if (!branchSelect.value) {
-      alert("Please select a branch");
-      return;
-    }
-    setSelectedBranch(branchSelect.value);
+@@ -57,78 +62,180 @@ function initHomePage() {
     alert(`Branch set to ${branchSelect.value}`);
   };
 }
@@ -79,6 +81,45 @@ function initBookingPage() {
   loadLatestBooking(branch);
   setupButtons(branch);
   setupEnterNavigation();
+  setupBookingFeeCalculations();
+}
+
+async function checkForAppUpdate() {
+  try {
+    const response = await fetch(`${VERSION_URL}?t=${Date.now()}`, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) return;
+
+    const remoteVersion = Number.parseInt((await response.text()).trim(), 10);
+
+    if (Number.isNaN(remoteVersion) || remoteVersion <= APP_VERSION) return;
+
+    const shouldUpdate = window.confirm(
+      `A new app version (${remoteVersion}) is available. Update now?`
+    );
+
+    if (!shouldUpdate) return;
+
+    await forceRefreshApp();
+  } catch (error) {
+    console.warn("Version check failed:", error);
+  }
+}
+
+async function forceRefreshApp() {
+  if ("serviceWorker" in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(registration => registration.unregister()));
+  }
+
+  if ("caches" in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(key => caches.delete(key)));
+  }
+
+  location.href = `${location.pathname}?updated=${Date.now()}`;
 }
 
 
@@ -100,6 +141,11 @@ function unlockForm() {
     .querySelectorAll(".booking-body input, .booking-body select")
     .forEach(el => {
       if (el.id !== "branchFrom") {
+        if (el.id === "freight" || el.id === "total") {
+          el.readOnly = true;
+          return;
+        }
+
         el.tagName === "SELECT"
           ? (el.disabled = false)
           : (el.readOnly = false);
@@ -107,6 +153,63 @@ function unlockForm() {
     });
 }
 
+function setupBookingFeeCalculations() {
+  const weightInput = document.getElementById("weight");
+  const freightRateInput = document.getElementById("freightExtra");
+  const freightInput = document.getElementById("freight");
+  const doorDeliveryInput = document.getElementById("doorDelivery");
+  const extraCharges1Input = document.getElementById("extraCharges1");
+  const extraCharges2Input = document.getElementById("extraCharges2");
+  const totalInput = document.getElementById("total");
+
+  if (
+    !weightInput ||
+    !freightRateInput ||
+    !freightInput ||
+    !doorDeliveryInput ||
+    !extraCharges1Input ||
+    !extraCharges2Input ||
+    !totalInput
+  ) {
+    return;
+  }
+
+  freightInput.readOnly = true;
+  totalInput.readOnly = true;
+
+  const toNumber = value => {
+    const n = Number.parseFloat(value);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const recalculate = () => {
+    const weight = toNumber(weightInput.value);
+    const freightRate = toNumber(freightRateInput.value);
+    const freight = weight * freightRate;
+    freightInput.value = freight ? freight : "";
+
+    const total =
+      freight +
+      freightRate +
+      toNumber(doorDeliveryInput.value) +
+      toNumber(extraCharges1Input.value) +
+      toNumber(extraCharges2Input.value);
+
+    totalInput.value = total ? total : "";
+  };
+
+  [
+    weightInput,
+    freightRateInput,
+    doorDeliveryInput,
+    extraCharges1Input,
+    extraCharges2Input
+  ].forEach(input => {
+    input.addEventListener("input", recalculate);
+  });
+
+  recalculate();
+}
 
 // ================= NEW BOOKING =================
 function newBooking() {
@@ -114,7 +217,7 @@ function newBooking() {
   unlockForm();
 
   document
-    .querySelectorAll(".booking-body input, .booking-body select")
+    .querySelectorAll(".booking-body input, .booking-body select")  
     .forEach(el => {
       if (el.id !== "branchFrom") el.value = "";
     });
