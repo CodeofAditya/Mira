@@ -45,7 +45,6 @@ function setSelectedBranch(branch) {
   sessionStorage.setItem("selectedBranch", branch);
 }
 
-// ================= HOMEPAGE =================
 function initHomePage() {
   const selectBtn = document.querySelector(".select-btn");
   const branchSelect = document.getElementById("branchSelect");
@@ -55,7 +54,10 @@ function initHomePage() {
 
   selectBtn.onclick = () => {
     if (!branchSelect.value) {
-@@ -57,78 +62,180 @@ function initHomePage() {
+      alert("Please select a branch");
+      return;
+    }
+
     alert(`Branch set to ${branchSelect.value}`);
   };
 }
