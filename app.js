@@ -192,7 +192,6 @@ function setupBookingFeeCalculations() {
 
     const total =
       freight +
-      freightRate +
       toNumber(doorDeliveryInput.value) +
       toNumber(extraCharges1Input.value) +
       toNumber(extraCharges2Input.value);
